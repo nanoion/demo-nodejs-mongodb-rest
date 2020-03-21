@@ -31,4 +31,9 @@ router.delete('/values/:id', function(req, res) {
   res.send(JSON.stringify({status: "ok", value: uuid}));
 });
 
+/* Health Check */
+router.get('/health', function (req, res) {
+  res.send(JSON.stringify({status: 'UP'}));
+});
+
 module.exports = router;
