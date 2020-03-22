@@ -12,9 +12,21 @@ resource "docker_image" "mongo" {
 }
 
 ##### Create Private Network #####
-resource "docker_network" "private_network" {
-    name = "app_network"
+resource "docker_network" "private_net" {
+    name = "private_net"
+    internal = true
     check_duplicate = true
+}
+
+resource "docker_network" "public_net" {
+    name = "public_net"
+    check_duplicate = true
+}
+
+
+##### Create Volume for store data files #####
+resource "docker_volume" "db_volume" {
+  name = "db_volume"
 }
 
 ##### MongoDB Provisioning #####
@@ -33,17 +45,13 @@ resource "docker_container" "db" {
      value="${var.env}"
    }
    networks_advanced {
-     name="${docker_network.private_network.name}"
+     name="${docker_network.private_net.name}"
    }
    volumes {
-       host_path = "${var.data_dir}"
+       volume_name = "db_volume"
        container_path = "/data/db"
    }
-   volumes{
-      host_path = "${var.work_dir}mongo-init.js"
-      container_path = "/docker-entrypoint-initdb.d/mongo-init.js"
-      read_only=true
-   }
+
    ports {
        internal = 27017
    }
@@ -54,7 +62,7 @@ resource "docker_container" "db" {
         retries= 5
         start_period= "40s"
    }
-   depends_on = ["docker_network.private_network"]
+   depends_on = ["docker_network.private_net"]
 }
 
 ##### NodeJS Provisioning #####
@@ -70,8 +78,12 @@ resource "docker_container" "app" {
     value="${var.env}"
   }
   networks_advanced {
-     name="${docker_network.private_network.name}"
+     name="${docker_network.private_net.name}"
    }
+   networks_advanced {
+     name="${docker_network.public_net.name}"
+   }
+   
   ports {
     internal = 3000
     external = 3000

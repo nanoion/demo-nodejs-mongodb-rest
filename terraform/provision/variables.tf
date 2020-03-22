@@ -2,19 +2,13 @@ variable "docker_host" {
     default = "tcp://127.0.0.1:2375"
 }
 
+variable "app_ip" {
+    default = "docker_container.app.*.ip_address"
+}
+
 variable "env" {
     type = string
     default = "production"
-}
-
-variable "data_dir" {
-    type = string
-    default = "/data/db"
-}
-
-variable "work_dir" {
-    type = string
-    default = "/mnt/d/projects/demo-nodejs-mongodb-rest"
 }
 
 variable "mongo_uri" {
