@@ -2,10 +2,6 @@ variable "docker_host" {
     default = "tcp://127.0.0.1:2375"
 }
 
-variable "app_ip" {
-    default = "docker_container.app.*.ip_address"
-}
-
 variable "env" {
     type = string
     default = "production"

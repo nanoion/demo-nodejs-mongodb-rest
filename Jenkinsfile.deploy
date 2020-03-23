@@ -1,0 +1,33 @@
+//Assume Pipeline name is 'Deploy'.
+
+pipeline{
+    agent any
+
+    stages{
+      stage('Checkout') {
+        steps{
+          script {
+            currentBuild.displayName = "DEPLOY_IMAGE"
+            currentBuild.description = "Deploy Docker Image"
+          }
+          checkout scm
+        }
+        post{
+          success{
+            echo "======== Pull Success ========"
+          }
+        }
+      }
+      stage("Deploy App"){
+          steps{
+              sh "terraform init ./terraform/provision/"
+              sh "terraform apply -auto-approve ./terraform/provision/"
+          }
+          post{
+              success{
+                  echo "======== Complete Deploy ========"
+              }
+          }
+      }
+    }
+}

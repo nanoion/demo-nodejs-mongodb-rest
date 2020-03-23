@@ -1,6 +1,8 @@
-##### Required Teraform 0.12 or newer #####
+##### This file is required Teraform 0.12 or newer #####
+
 provider "docker" {
-  host = var.docker_host
+  # host = var.docker_host // Use for build outside Docker 
+  host = "unix:///var/run/docker.sock" // Use for build inside Docker (dind)
 }
 
 ##### Docker Images #####
@@ -22,7 +24,6 @@ resource "docker_network" "public_net" {
     name = "public_net"
     check_duplicate = true
 }
-
 
 ##### Create Volume for store data files #####
 resource "docker_volume" "db_volume" {
@@ -79,10 +80,10 @@ resource "docker_container" "app" {
   }
   networks_advanced {
      name="${docker_network.private_net.name}"
-   }
-   networks_advanced {
+  }
+  networks_advanced {
      name="${docker_network.public_net.name}"
-   }
+  }
    
   ports {
     internal = 3000
